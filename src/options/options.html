@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Voice Studio - Voice Changer for WhatsApp Web</title>
+  <link rel="icon" href="../../icons/icon32.png" />
+  <link rel="stylesheet" href="../shared/theme.css" />
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="topbar" role="banner">
+    <div class="topbar-inner">
+      <div class="brand">
+        <img class="brand-icon" src="../../icons/icon48.png" width="40" height="40" alt="" />
+        <div class="brand-text">
+          <h1 class="brand-name">Voice Studio</h1>
+          <p class="brand-sub">Voice Changer for WhatsApp Web <span class="version" id="version"></span></p>
+        </div>
+      </div>
+      <div class="topbar-controls">
+        <span class="pill" id="statusPill" role="status" aria-live="polite">Checking WhatsApp…</span>
+        <label class="master" for="masterSwitch">
+          <span class="master-label" id="masterLabel">Voice changer on</span>
+          <span class="switch">
+            <input type="checkbox" role="switch" id="masterSwitch" aria-describedby="masterLabel" />
+            <span class="switch-track"></span>
+          </span>
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <div class="studio">
+    <!-- ============================== Sidebar: preset library ============================== -->
+    <aside class="sidebar" aria-labelledby="presetsTitle">
+      <div class="sidebar-inner">
+        <div class="current card">
+          <p class="eyebrow">Current voice</p>
+          <div class="current-row">
+            <span class="current-emoji" id="currentEmoji" aria-hidden="true">🙂</span>
+            <div class="current-text">
+              <p class="current-name" id="currentName">Natural</p>
+              <p class="current-mod" id="currentModified" hidden>modified</p>
+            </div>
+            <button type="button" class="btn btn-sm" id="resetPreset" title="Restore the preset's original settings">Reset</button>
+          </div>
+          <div class="current-actions">
+            <button type="button" class="btn btn-sm btn-primary" id="saveAsBtn">Save as new preset</button>
+            <button type="button" class="btn btn-sm" id="updatePresetBtn" hidden title="Overwrite this custom preset with the current settings">Update preset</button>
+          </div>
+        </div>
+
+        <h2 class="section-title" id="presetsTitle">Preset library</h2>
+        <div class="search">
+          <label class="sr-only" for="presetSearch">Search presets</label>
+          <input type="search" id="presetSearch" class="input" placeholder="Search presets…" autocomplete="off" />
+        </div>
+        <div class="chips" id="categoryChips" role="tablist" aria-label="Preset categories"></div>
+        <div class="preset-grid" id="presetGrid" role="group" aria-labelledby="presetsTitle"></div>
+        <p class="empty" id="presetEmpty" hidden>No presets match.</p>
+
+        <div class="custom-tools">
+          <h3 class="mini-title">My presets</h3>
+          <div class="custom-buttons">
+            <button type="button" class="btn btn-sm" id="exportBtn">Export</button>
+            <button type="button" class="btn btn-sm" id="importBtn">Import</button>
+            <input type="file" id="importFile" accept="application/json,.json" hidden />
+          </div>
+          <p class="faint small" id="customNote">Right-click or use the ⋯ menu on a custom preset to rename or delete it.</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ============================== Main ============================== -->
+    <main class="main" id="main" tabindex="-1">
+      <!-- Mic test lab -->
+      <section class="card lab" aria-labelledby="labTitle">
+        <div class="lab-head">
+          <div>
+            <h2 class="section-title" id="labTitle">Mic test lab</h2>
+            <p class="muted small">Try your voice here before a call. Nothing is recorded or uploaded unless you press Record, and recordings stay on this page.</p>
+          </div>
+          <button type="button" class="btn btn-primary lab-start" id="testBtn" aria-pressed="false">
+            <span class="dot" aria-hidden="true"></span><span id="testBtnLabel">Start mic test</span>
+          </button>
+        </div>
+
+        <p class="notice notice-warn" id="labMessage" role="alert" hidden></p>
+
+        <div class="lab-controls">
+          <div class="field">
+            <label for="deviceSelect" class="field-label">Microphone</label>
+            <select id="deviceSelect" class="select" disabled>
+              <option value="">Default microphone</option>
+            </select>
+          </div>
+          <label class="toggle-row" for="monitorTest">
+            <span class="switch">
+              <input type="checkbox" role="switch" id="monitorTest" aria-describedby="monitorTestWarn" />
+              <span class="switch-track"></span>
+            </span>
+            <span>Hear myself</span>
+          </label>
+          <button type="button" class="btn" id="bypassBtn" disabled aria-describedby="bypassHint">Hold for original</button>
+          <button type="button" class="btn" id="recordBtn" disabled>Record 5 s</button>
+        </div>
+        <p class="notice notice-warn small" id="monitorTestWarn">🎧 Use headphones before turning on "Hear myself", or your speakers will feed back into the mic.</p>
+        <p class="sr-only" id="bypassHint">Press and hold (mouse, touch, Space or Enter) to hear your original voice.</p>
+
+        <div class="meters">
+          <div class="meter" id="meterIn">
+            <span class="meter-label">In</span>
+            <div class="meter-bar" role="meter" aria-label="Input level" aria-valuemin="-60" aria-valuemax="0" aria-valuenow="-60">
+              <span class="meter-fill"></span><span class="meter-peak"></span>
+            </div>
+            <span class="meter-value mono">−∞ dB</span>
+          </div>
+          <div class="meter" id="meterOut">
+            <span class="meter-label">Out</span>
+            <div class="meter-bar" role="meter" aria-label="Output level" aria-valuemin="-60" aria-valuemax="0" aria-valuenow="-60">
+              <span class="meter-fill"></span><span class="meter-peak"></span>
+            </div>
+            <span class="meter-value mono">−∞ dB</span>
+          </div>
+        </div>
+
+        <div class="scope">
+          <canvas id="scope" aria-label="Live spectrum and waveform of your processed voice" role="img"></canvas>
+          <div class="scope-legend small">
+            <span class="legend legend-spec">Spectrum</span>
+            <span class="legend legend-wave">Waveform</span>
+            <span class="legend-sep"></span>
+            <span class="mono faint" id="engineInfo">Engine idle</span>
+          </div>
+        </div>
+
+        <div class="recording" id="recording" hidden>
+          <audio id="recordAudio" controls preload="auto"></audio>
+          <a class="btn btn-sm" id="recordDownload" download="voice-sample.webm">Download</a>
+        </div>
+      </section>
+
+      <!-- Parameters -->
+      <section aria-labelledby="paramsTitle">
+        <div class="section-head">
+          <h2 class="section-title" id="paramsTitle">All parameters</h2>
+          <p class="muted small">Double-click a slider to reset it to the preset value. Changes apply live, even in the middle of a call.</p>
+        </div>
+        <div class="groups" id="groups"></div>
+      </section>
+
+      <div class="two-col">
+        <!-- Call settings -->
+        <section class="card pad" aria-labelledby="callTitle">
+          <h2 class="section-title" id="callTitle">Call settings</h2>
+          <label class="toggle-row" for="monitorCall">
+            <span class="switch">
+              <input type="checkbox" role="switch" id="monitorCall" aria-describedby="monitorCallWarn" />
+              <span class="switch-track"></span>
+            </span>
+            <span>Hear myself during calls</span>
+          </label>
+          <p class="notice notice-warn small" id="monitorCallWarn">🎧 Only with headphones, otherwise the other person will hear an echo.</p>
+          <p class="muted small">All settings apply live, even in the middle of a call. No need to hang up.</p>
+          <label class="toggle-row" for="fileButton">
+            <span class="switch">
+              <input type="checkbox" role="switch" id="fileButton" aria-describedby="fileButtonHint" />
+              <span class="switch-track"></span>
+            </span>
+            <span>Show the 🎵 audio-file button on WhatsApp Web</span>
+          </label>
+          <p class="muted small" id="fileButtonHint">A small round button on the right edge of WhatsApp Web that sends a song or audio file as a voice note. When hidden, you can still open it from the toolbar popup.</p>
+        </section>
+
+        <!-- Shortcuts -->
+        <section class="card pad" aria-labelledby="keysTitle">
+          <h2 class="section-title" id="keysTitle">Keyboard shortcuts</h2>
+          <ul class="shortcuts" id="shortcutList"></ul>
+          <p class="muted small" id="shortcutNote" hidden></p>
+          <button type="button" class="btn btn-sm" id="shortcutBtn">Change shortcuts</button>
+        </section>
+      </div>
+
+      <!-- Help -->
+      <section class="card pad help" aria-labelledby="helpTitle">
+        <h2 class="section-title" id="helpTitle">Help</h2>
+        <details open>
+          <summary>How it works</summary>
+          <p>The extension hooks the microphone that WhatsApp Web asks for and passes it through a voice-effects engine running inside your browser. WhatsApp receives the changed voice for calls and voice messages.</p>
+          <p>All processing happens locally on your computer. Nothing is uploaded, and the extension makes no network requests.</p>
+        </details>
+        <details>
+          <summary>Send a song or audio file as a voice note</summary>
+          <ol class="steps">
+            <li>Open WhatsApp Web, click the round 🎵 button on the right edge (or "🎵 Send audio file as voice note" in the toolbar popup), choose or drop an audio file, trim it if you like, and press <strong>Arm for next voice note</strong>.</li>
+            <li>Open any chat and click WhatsApp's own 🎤 microphone button. The file starts playing into the recording by itself.</li>
+            <li>When the panel says it has finished, press WhatsApp's <strong>Send ➤</strong>.</li>
+          </ol>
+          <ul>
+            <li>The other person sees and hears it as a normal voice message, with the usual waveform bubble.</li>
+            <li>Voice notes are mono and compressed for speech, so music sounds like a phone recording, not like the original file.</li>
+            <li>Your microphone is muted during that recording. Turn on <em>Include my microphone</em> to sing or talk over the track (karaoke), and <em>Apply my voice effect</em> to run the file through your current voice.</li>
+            <li>Works with MP3, M4A/AAC, WAV, OGG/Opus, FLAC and the audio of WebM/MP4 files, up to 30 minutes / 150 MB. The file never leaves your computer except inside the voice note you send.</li>
+          </ul>
+        </details>
+        <details>
+          <summary>Tips</summary>
+          <ul>
+            <li>Wear headphones, especially when using "Hear myself".</li>
+            <li>Start from a preset, then fine-tune the parameters.</li>
+            <li>Lower <em>Effect mix</em> for a more subtle, believable change.</li>
+            <li>Use the mic test lab and Record 5 s to hear what the other side hears.</li>
+          </ul>
+        </details>
+        <details>
+          <summary>Troubleshooting</summary>
+          <ul>
+            <li>Reload the WhatsApp Web tab after installing or updating the extension.</li>
+            <li>It works only on <strong>web.whatsapp.com</strong> in Chrome or Edge, not in the WhatsApp desktop or phone app.</li>
+            <li>If the other side hears nothing, turn the extension off with the master switch (your normal voice passes through) and report the problem.</li>
+            <li>If the status shows an error, reload the WhatsApp tab and start the call again.</li>
+          </ul>
+        </details>
+        <details>
+          <summary>Privacy</summary>
+          <p>Your voice never leaves your device except through WhatsApp itself. Settings and custom presets are stored locally in your browser. Test recordings exist only in this page until you close it or download them.</p>
+        </details>
+      </section>
+
+      <footer class="foot faint small">Voice Changer for WhatsApp Web · not affiliated with WhatsApp or Meta.</footer>
+    </main>
+  </div>
+
+  <!-- Save / rename dialog -->
+  <dialog class="modal card" id="presetDialog" aria-labelledby="presetDialogTitle">
+    <form method="dialog" id="presetForm">
+      <h2 class="section-title" id="presetDialogTitle">Save as new preset</h2>
+      <div class="field">
+        <label for="presetName" class="field-label">Name</label>
+        <input type="text" id="presetName" class="input" maxlength="40" required autocomplete="off" />
+      </div>
+      <fieldset class="emoji-field">
+        <legend class="field-label">Icon</legend>
+        <div class="emoji-grid" id="emojiGrid" role="radiogroup" aria-label="Preset icon"></div>
+      </fieldset>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="presetCancel">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="presetSubmit" value="ok">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Confirm dialog -->
+  <dialog class="modal card" id="confirmDialog" aria-labelledby="confirmTitle">
+    <form method="dialog">
+      <h2 class="section-title" id="confirmTitle">Delete preset?</h2>
+      <p class="muted" id="confirmText"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="confirmCancel">Cancel</button>
+        <button type="submit" class="btn btn-danger" id="confirmOk" value="ok">Delete</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Custom preset context menu -->
+  <div class="menu card" id="presetMenu" role="menu" hidden>
+    <button type="button" role="menuitem" class="menu-item" data-action="rename">Rename…</button>
+    <button type="button" role="menuitem" class="menu-item" data-action="update">Update with current settings</button>
+    <button type="button" role="menuitem" class="menu-item menu-danger" data-action="delete">Delete…</button>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="../shared/params.js"></script>
+  <script src="../engine/dsp-core.js"></script>
+  <script src="../engine/voice-engine.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

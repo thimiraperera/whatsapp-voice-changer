@@ -1,0 +1,5 @@
+# test output
+tests/e2e/out/
+tests/e2e/voice140.wav
+
+*.zip

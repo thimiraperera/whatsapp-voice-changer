@@ -1,0 +1,382 @@
+/* Popup layout, uses the tokens and components from ../shared/theme.css */
+
+[hidden] {
+  display: none !important;
+}
+
+html,
+body {
+  width: 380px;
+  max-height: 600px;
+  overflow: hidden;
+}
+
+.popup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 600px;
+  padding: 12px 14px 10px;
+  background:
+    radial-gradient(120% 60% at 100% 0%, var(--accent-soft), transparent 55%),
+    var(--bg);
+}
+
+/* ---------------------------------------------------------------- Header */
+
+.hdr {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+}
+.hdr-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  flex: none;
+}
+.hdr-text {
+  flex: 1;
+  min-width: 0;
+}
+.hdr-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 15.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+.hdr-sub {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.2;
+}
+
+/* ---------------------------------------------------------------- Status */
+
+.status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 28px;
+  flex: none;
+}
+.status-line {
+  min-width: 0;
+  flex: 1;
+}
+.status-line .pill {
+  max-width: 100%;
+  min-width: 0;
+  white-space: nowrap;
+  animation: pop-in 0.22s var(--ease);
+}
+/* Text lives in its own span: text-overflow does not apply to bare text in an inline-flex pill. */
+.pill-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.status-line .pill::before {
+  flex: none;
+}
+.pill-sub {
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+/* ---------------------------------------------------------------- Audio file -> voice note */
+
+.vn {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: none;
+  margin-top: -2px;
+}
+.vn-btn {
+  width: 100%;
+  height: 34px;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 0 12px;
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border-strong));
+  background: linear-gradient(90deg, var(--accent-soft), transparent 80%), var(--panel-2);
+  font-size: 13px;
+}
+.vn-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: linear-gradient(90deg, var(--accent-soft), var(--accent-soft)), var(--panel-hover);
+}
+.vn-btn:disabled {
+  border-color: var(--border-strong);
+  background: var(--panel-2);
+}
+.vn-btn::after {
+  content: '›';
+  margin-left: auto;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--text-dim);
+}
+.vn-ico {
+  font-size: 15px;
+  line-height: 1;
+}
+.vn-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vn-hint {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.3;
+}
+
+/* ---------------------------------------------------------------- Current voice */
+
+.current {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px 8px 12px;
+  border-radius: var(--radius);
+  flex: none;
+}
+.current-emoji {
+  font-size: 24px;
+  line-height: 1;
+  width: 30px;
+  flex: none;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: center;
+  transition: transform 0.25s var(--ease);
+}
+.current-emoji.bump {
+  animation: bump 0.32s var(--ease);
+}
+.current-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+.current-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.current-name {
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.current-mod {
+  color: var(--warn);
+  font-weight: 600;
+  font-size: 12px;
+}
+
+/* ---------------------------------------------------------------- Presets */
+
+.presets {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+/* Wrap instead of a hidden horizontal scroller: every category stays visible and reachable
+   at 380 px (7 chips need ~2 rows once "My presets" appears). */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 2px;
+  margin: -2px -2px 0;
+  flex: none;
+}
+.chip {
+  height: 25px;
+  padding: 0 8px;
+  font-size: 12px;
+  transition: background 0.15s var(--ease), border-color 0.15s var(--ease), color 0.15s var(--ease);
+}
+.chip:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  overflow-y: auto;
+  /* Fixed preferred height so the popup window doesn't resize when switching categories;
+     it may only shrink (down to ~2 rows) when the chip row wraps. */
+  flex: 0 1 222px;
+  min-height: 132px;
+  max-height: 222px;
+  padding: 2px 4px 2px 2px;
+  margin: 0 -4px 0 -2px;
+  align-content: start;
+}
+.grid .preset {
+  min-height: 64px;
+  padding: 7px 3px;
+  animation: tile-in 0.24s var(--ease) both;
+}
+.grid .preset:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+.grid .preset[aria-pressed='true']:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--accent), var(--focus-ring);
+}
+.preset-emoji,
+.preset-name {
+  flex: none;
+  max-width: 100%;
+}
+/* Custom presets may carry up to 8 chars of "emoji" (ZWJ sequences, flags, text): never overflow. */
+.preset-emoji {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: clip;
+}
+.preset-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+.grid-empty {
+  grid-column: 1 / -1;
+  padding: 18px 8px;
+  text-align: center;
+  font-size: 12.5px;
+}
+
+/* ---------------------------------------------------------------- Quick sliders */
+
+.quick {
+  flex: none;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.sliders {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 14px;
+  row-gap: 2px;
+}
+.qs {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.qs-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+  cursor: default;
+  user-select: none;
+}
+.qs-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.qs-value {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  padding: 0 4px;
+  border-radius: 5px;
+  transition: background 0.2s var(--ease), color 0.2s var(--ease);
+}
+.qs.is-changed .qs-value {
+  color: var(--accent);
+}
+.qs-value.flash {
+  background: var(--accent-soft);
+}
+
+.popup.is-off .quick,
+.popup.is-off .current,
+.popup.is-off .presets {
+  opacity: 0.55;
+  filter: saturate(0.4);
+}
+.quick,
+.current,
+.presets {
+  transition: opacity 0.25s var(--ease), filter 0.25s var(--ease);
+}
+
+/* ---------------------------------------------------------------- Footer */
+
+.ftr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex: none;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.shortcuts {
+  margin: 0;
+  font-size: 11px;
+  text-align: right;
+  line-height: 1.7;
+}
+.shortcuts .kbd {
+  font-size: 10px;
+  padding: 0 4px;
+}
+
+/* ---------------------------------------------------------------- Motion */
+
+@keyframes tile-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes bump {
+  40% {
+    transform: scale(1.25) rotate(-6deg);
+  }
+  100% {
+    transform: none;
+  }
+}

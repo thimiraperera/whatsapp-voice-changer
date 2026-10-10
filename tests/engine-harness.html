@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voice Engine Harness</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f6f7f9;
+    --panel: #ffffff;
+    --text: #1b1f24;
+    --muted: #5b6573;
+    --line: #dde2e8;
+    --pass: #13844a;
+    --pass-bg: #e3f6ec;
+    --fail: #c4202f;
+    --fail-bg: #fde8ea;
+    --warn: #9a6400;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111418;
+      --panel: #191d22;
+      --text: #e7eaee;
+      --muted: #97a1ad;
+      --line: #2b3139;
+      --pass: #46c97f;
+      --pass-bg: #123222;
+      --fail: #ff6b78;
+      --fail-bg: #3a1419;
+      --warn: #f0b44c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px 16px 48px;
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 1400px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p.lead { margin: 0 0 16px; color: var(--muted); }
+  #summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+  #verdict { font-weight: 700; font-size: 16px; }
+  #verdict.pass { color: var(--pass); }
+  #verdict.fail { color: var(--fail); }
+  #summary .meta { color: var(--muted); }
+  #banner {
+    display: none;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    background: var(--fail-bg);
+    color: var(--fail);
+    font-weight: 600;
+  }
+  .table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; min-width: 1100px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  th { position: sticky; top: 0; background: var(--panel); font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); }
+  td.num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  tr.fail td { background: var(--fail-bg); }
+  .badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+  .badge.pass { color: var(--pass); background: var(--pass-bg); }
+  .badge.fail { color: var(--fail); background: var(--fail-bg); }
+  .checks { margin: 0; padding: 0; list-style: none; font-size: 12px; }
+  .checks li.bad { color: var(--fail); font-weight: 600; }
+  .checks li.ok { color: var(--muted); }
+  .notes { font-size: 12px; color: var(--warn); }
+  .errors { font-size: 12px; color: var(--fail); font-family: ui-monospace, Consolas, monospace; white-space: pre-wrap; }
+  code { font-family: ui-monospace, Consolas, monospace; font-size: 12px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Voice engine test harness</h1>
+  <p class="lead">
+    Renders every built-in preset through <code>WVC.VoiceEngine</code> in an <code>OfflineAudioContext(1, 3&nbsp;s, 48&nbsp;kHz)</code>
+    fed with a synthetic voice (140&nbsp;Hz pulse train through formant resonators, syllable envelope), plus bypass,
+    mid-render update, ScriptProcessor-fallback and realtime lifecycle cases. Results are exposed as
+    <code>window.__WVC_TEST_RESULTS</code>.
+  </p>
+  <div id="banner" role="alert"></div>
+  <div id="summary" aria-live="polite">
+    <span id="verdict">Running…</span>
+    <span class="meta" id="progress"></span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Case</th>
+          <th>Result</th>
+          <th>Core</th>
+          <th>Latency ms</th>
+          <th>NaN</th>
+          <th>Peak</th>
+          <th>RMS dBFS</th>
+          <th>Δ level dB</th>
+          <th>f0 in → out (exp.) Hz</th>
+          <th>Checks</th>
+          <th>Notes / errors</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+</main>
+<script src="../src/shared/params.js"></script>
+<script src="../src/engine/dsp-core.js"></script>
+<script src="../src/engine/voice-engine.js"></script>
+<script src="engine-harness.js"></script>
+</body>
+</html>

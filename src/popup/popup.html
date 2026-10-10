@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=380" />
+    <title>Voice Changer</title>
+    <link rel="stylesheet" href="../shared/theme.css" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="popup" id="app">
+      <header class="hdr">
+        <img class="hdr-icon" src="../../icons/icon32.png" width="28" height="28" alt="" />
+        <div class="hdr-text">
+          <h1 class="hdr-title">Voice Changer</h1>
+          <p class="hdr-sub faint">for WhatsApp Web</p>
+        </div>
+        <label class="switch hdr-switch" title="Turn the voice changer on or off">
+          <input type="checkbox" id="enabled" role="switch" aria-label="Voice changer enabled" />
+          <span class="switch-track"></span>
+        </label>
+      </header>
+
+      <section class="status" aria-label="Status">
+        <div id="status" class="status-line" role="status" aria-live="polite">
+          <span class="pill">Checking…</span>
+        </div>
+        <button type="button" id="openWa" class="btn btn-primary btn-sm" hidden>Open WhatsApp Web</button>
+        <button type="button" id="reloadWa" class="btn btn-sm" hidden title="Reload the WhatsApp Web tab so the voice changer can attach">Reload tab</button>
+      </section>
+
+      <section class="vn" aria-label="Audio file">
+        <button type="button" id="voiceNote" class="btn vn-btn" aria-describedby="voiceNoteHint">
+          <span class="vn-ico" aria-hidden="true">🎵</span><span class="vn-label">Send audio file as voice note</span>
+        </button>
+        <p id="voiceNoteHint" class="vn-hint faint" hidden>Open a WhatsApp Web tab first to use this.</p>
+      </section>
+
+      <section class="current card" aria-label="Current voice">
+        <span id="curEmoji" class="current-emoji" aria-hidden="true">🙂</span>
+        <div class="current-text">
+          <span class="current-label faint">Current voice</span>
+          <span class="current-name"><span id="curName">Natural</span><span id="curMod" class="current-mod" hidden> • modified</span></span>
+        </div>
+        <button type="button" id="reset" class="btn btn-ghost btn-sm" title="Re-apply the preset's settings" disabled>Reset</button>
+      </section>
+
+      <section class="presets" aria-label="Voice presets">
+        <div id="chips" class="chips" role="tablist" aria-label="Preset categories"></div>
+        <div id="grid" class="grid" role="tabpanel" aria-label="Presets"></div>
+      </section>
+
+      <section class="quick" aria-label="Quick adjustments">
+        <div id="sliders" class="sliders"></div>
+      </section>
+
+      <footer class="ftr">
+        <button type="button" id="studio" class="btn btn-sm">Open Voice Studio</button>
+        <p id="shortcuts" class="shortcuts faint"></p>
+      </footer>
+    </main>
+    <script src="../shared/params.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
